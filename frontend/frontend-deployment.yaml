@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: express-frontend
+  labels:
+    app: express-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: express-frontend
+  template:
+    metadata:
+      labels:
+        app: express-frontend
+    spec:
+      containers:
+      - name: frontend
+        image: faiz1487/express-frontend:latest  # replace if needed
+        ports:
+        - containerPort: 3000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+spec:
+  type: NodePort
+  selector:
+    app: express-frontend
+  ports:
+  - name: http
+    port: 3000
+    targetPort: 3000
+    nodePort: 30007
