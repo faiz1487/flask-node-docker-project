@@ -1,0 +1,42 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Clone Repository') {
+            steps {
+                git branch: 'main',
+                    url: 'https://github.com/faiz1487/flask-node-docker-project.git'
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                sh '''
+                cd backend
+                python3 -m venv venv
+                . venv/bin/activate
+                pip install --upgrade pip
+                pip install -r requirements.txt
+                '''
+            }
+        }
+
+        stage('Restart Flask App') {
+            steps {
+                sh '''
+                cd backend
+                pm2 restart flask-app || pm2 start app.py --name flask-app --interpreter python3
+                '''
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "✅ Flask CI/CD Pipeline Successful"
+        }
+        failure {
+            echo "❌ Flask CI/CD Pipeline Failed"
+        }
+    }
+}
