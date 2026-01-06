@@ -1,0 +1,43 @@
+pipeline {
+    agent any
+
+    tools {
+        nodejs 'node18'
+    }
+
+    stages {
+        stage('Clone Repository') {
+            steps {
+                git branch: 'main',
+                    url: 'https://github.com/faiz1487/flask-node-docker-project.git'
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                sh '''
+                cd frontend
+                npm install
+                '''
+            }
+        }
+
+        stage('Restart Express App') {
+            steps {
+                sh '''
+                cd frontend
+                pm2 restart express-app || pm2 start server.js --name express-app
+                '''
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "✅ Express CI/CD Pipeline Successful"
+        }
+        failure {
+            echo "❌ Express CI/CD Pipeline Failed"
+        }
+    }
+}
